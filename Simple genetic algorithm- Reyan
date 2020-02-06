@@ -1,0 +1,163 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+plt.rcParams['figure.figsize']=[8,6]
+x1_range=[-100,100]
+x2_range=[-100,100]
+
+population=[]
+
+def populate(features,size=1000):
+    
+    initial=[]
+    #population
+    
+    for _ in range(size):
+        
+        entity = []
+        #an individual
+        
+        for feature in features:
+            
+            #featuers = [x1_range,x2_range] so in the first loop feature = features[0] and on the 2nd loop feature = features[1]
+            #featuers=[[-100,100],[-100,100]]
+            #(feature)= [-100,100] and (*feature)= -100 100
+            
+            val = np.random.randint(*feature)
+            #val= to a random between the ranges og -100 and 100
+            
+            entity.append(val)
+            #After 2 loop of features entity=[val,val] 
+            #entity = an individual = chromosome
+            # and each val is a gen
+                
+        initial.append(entity)
+        #By the end on the loop we have generated a population 
+        #with each endividual/entity having having a gen of [x1,x2]
+        #We now have a matrices on 1 row and 1000 cols
+        #i.e --> [[x1,x2],[x1,x2],[x1,x2],[x1,x2]]
+    
+    return np.array(initial)  
+    #np.array converts this to 1000 row and 2 col
+    #i.e --> 
+    # [[x1,x2]
+    #  [x1,x2]
+    #  [x1,x2]
+    #  [x1,x2]]
+
+virus = np.array([0,0])
+
+
+def fitness(population, virus, size=100):
+    
+    scores=[]
+    
+    for index, entity in enumerate(population):
+        #this for loop will index/number each entity/individual/chromosome
+        #i.e ---> 
+        #0[56,-89]
+        #1[4,65]....
+        
+        score=np.sum((entity-virus)**2)
+        #score ===> (entity[x1,x2]-virus[x1,x2]) => [x1-x1,x2-x2]^2 => [x1^2,x2^2] => x1^2 + x2^2
+        
+        scores.append((score, index))
+        #this will index/number each score to match the individual's number
+        #[(score=54235,index=0),(score=365,index=1).....(score=39878,index=1000)]
+        
+    score = sorted(scores)[:size]
+    #score will sort from best(lowest) to the worest score
+    #and select best 100 chromosomes/individual/entity  
+    
+    
+    return np.array((score))[:,1]
+    #this will return the top 100 endiviuals
+    
+
+def draw(population, virus):
+    plt.xlim((-100,100))
+    plt.ylim((-100,100))
+    plt.scatter(population[:,0],population[:,1],c='green',s=12)
+    plt.scatter(virus[0], virus[1], c ='red', s = 60)
+    
+    
+    
+    
+def reduction(population,virus,size=100):
+    
+    fittest = fitness(population, virus, size)  
+    #fittest = the top 100 endiviuals
+    
+    new_pop=[]
+    
+    for item in fittest:
+        #item = individual number
+        new_pop.append(population[item])
+        #store the 100 fittest individuals in the format of thier chromosoms >> [x1,x2]
+        
+    return np.array(new_pop)
+    #return the top 100 in a 100x2 matrices
+    
+def cross(population, size=1000):
+    #population= to the top 100 fittest chromosomes not the entire 1000 previous population
+    
+    
+    new_pop=[]
+    
+    for _ in range(size):
+        
+        p=population[np.random.randint(0,len(population))]
+        # p=papa=randomly selected chromosome from the top 100
+        #print('p-',*p)
+        m=population[np.random.randint(0,len(population))]
+        # m=mama=randomly selected chromosome from the top 100
+        #print('m-',*m)
+        
+        entity=[]
+        #entity= empty baby chromosome/individual
+        
+        entity.append(*p[:len(p)//2])
+        #the first geen x1 is papa's
+        entity.append(*m[len(m)//2:])
+        #the second geen x1 is mama's
+        
+        #so if papa=[5,9] and mama=[3,7] then new baby=[5,7]
+        #it is polygomus relationship so the parents will reproduce with a different parrensts randomly selected untill pop reach 1000
+        new_pop.append(entity)
+        
+        
+    return np.array(new_pop)
+    #return the new generation of 1000 stronger
+
+def mutate(population):
+    
+    return population + np.random.randint(-10,10,2000).reshape(1000,2)
+    #np.random.randint(-10,10,2000) will create an array length of 2000 with values between -10 and 10
+    #.reshape(1000,2) will convert the 1x2000 to 1000x2
+    #at the end this will looklike i.e>> if chromosome=[99,-4] and the randomly generated matrix=[1,-9]
+    #>>>now mutated chromosome=[100,-13]
+
+
+
+population=populate([x1_range,x2_range],1000)
+#this is calling the populate function, which is only for the 1st/initial generation
+
+def cycle(population,virus,gens):
+    
+    for _ in range(gens):
+        
+        population = reduction(population, virus, 100)
+        #population= to the top 100 fittest chromosomes
+    
+        population = cross(population,1000)
+        #new generation of 1000 stronger
+        
+        population = mutate(population)
+        #new generation mutated
+        
+    return population
+
+
+
+population = cycle(population, virus,20) 
+draw(population,virus)
