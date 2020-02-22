@@ -16,49 +16,6 @@ train_output=np.matrix(train_output_data.values)
 
 # NEURAL NETWORK DEFINITION
 
-#def initNN(struct, learn_rate):
- #   create_wmatrix()
-
-def create_wmatrix(struct):
-    w = []
-    struct = [3, 5, 4]
-    for i in range(len(struct) - 1):
-        cols_rows = (struct[i + 1], struct[i])
-        rand_weights = 2 * np.random.random(cols_rows) - 1
-        w.append(rand_weights)
-        
-    return w
-
-def trainNN(self):
-    pass
-
-def runNN(inputs, struct, w):
-    
-    # COLUMN VECTOR. also make it a matrix ndim2
-    inputs = np.array(ivec, ndmin=2).T
-    
-    # LOOP HIDDEN LAYERS + OUTPUT
-    outputs = None
-    for i in range(len(struct - 1):
-        outputs = activ_fn(np.dot(w[i], inputs))
-        inputs = outputs
-        
-    return outputs
-    
-
-
-# NETWORK MATRICES - MIGHT CHANGE THIS
-inodes = 24
-hnodes = 24
-onodes = 4
-ivec = []
-nwork = NeuralNetwork(inodes, onodes, hnodes, 0.1)
-
-# RUN THE NETWORK WITH INITIAL WEIGHTS IN IVEC
-# output = nwork.run(ivec)
-
-
-
 
 ################################### NN ######################################
 def sigmoid(x):
@@ -101,7 +58,7 @@ def feed_forward(entity):
 plt.rcParams['figure.figsize']=[8,6]
 
 target=0
-size=100
+size=20
 
 population=[]
 
@@ -136,6 +93,10 @@ def fitness(population,target, size):
     print('done')
     #print('scores:',len(scores),type(scores))#,np.array(scores).shape)
     #top_score=sorted(scores)[:size]
+    xx = np.array(scores)
+    yy = xx[:, 0]
+    zz = yy.argsort()
+    print(zz)
     top_score=np.array(scores)[np.array(scores)[:,0].argsort()]
     #print('top_score:',len(top_score),type(top_score),top_score[0][0])
     for i in range(size):

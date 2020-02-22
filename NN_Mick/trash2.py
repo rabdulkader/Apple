@@ -73,7 +73,10 @@ def populate(size, struct):
 # or define genes inside the weight matrix
 def mate(population, pop_size, struct):
     #print('mate')
-    pop_new=[]
+    # dont need to pass in popsize as we can calculate it using population
+    pop_new=[None]*pop_size
+    index1 = 0
+    index2 = 1
     
     # pair 2 individuals, so loop popsize/2 times
     for _ in range(int(pop_size/2)):
@@ -86,14 +89,14 @@ def mate(population, pop_size, struct):
         # one-point crossover (first half of w_matrices are swapped)
         # TWO CHILDREN
         for w_matrix in range(len(p1) / 2):
-            p1[w_matrix], p2[w_matrix] = p2[w_matrix], p1[(w_matrix]
+            p1[w_matrix], p2[w_matrix] = p2[w_matrix], p1[w_matrix]
             
         # total mix crossover (mix elements of every w_matrix)
         # if ele are the same they dont change
         # ONE CHILD? this menas pop size is reduced in half though...
-        for w_matrix in range(len(p1)):
-            for ele in w_matrix:
-                p1[w_matrix][ele] = (p1[w_matrix][ele] + p2[w_matrix][ele]) / 2
+        #for w_matrix in range(len(p1)):
+         #   for ele in w_matrix:
+          #      p1[w_matrix][ele] = (p1[w_matrix][ele] + p2[w_matrix][ele]) / 2
             
         # MUTATE - pick a random gene (w_matrix)
         # generate a new weight matrix completely randomly
@@ -102,43 +105,36 @@ def mate(population, pop_size, struct):
         # or pass in struct
         #struct = range(len(p1[0]))
         #random_gene = np.random.random()
-        
+        #random_gene = random.choice(p1)
+
         # could gen range(len()) myself then pick random from that list / iterator
         # but randrange does this 
+        
+        # P1
         random_gene_index = randrange(len(p1))
         random_gene = p1[random_gene_index]
-
-        #random_gene = random.choice(p1)
         mutation=2*np.random.random(random_gene.shape)-1
         mutated_gene = random_gene + mutation
         p1[random_gene_index] = mutated_gene
         
-        #
-        for i in range(2):
-            
-            
-            if i == 0:
-               
-                child = np.concatenate(([p1[:10],p2[10:]]))
-                
-            if i == 1:
-                child = np.concatenate(([p2[:10],p1[10:]]))
-            
-            # this mutation adds to all the matrices
-            # value between 1 and -1
-            mutation=2*np.random.random((20,))-1
-            
-            child=child+mutation
-            
-            pop_new.append(child)
-            
-    return np.array(pop_new)
+        # P2
+        random_gene_index = randrange(len(p2))
+        random_gene = p2[random_gene_index]
+        mutation=2*np.random.random(random_gene.shape)-1
+        mutated_gene = random_gene + mutation
+        p2[random_gene_index] = mutated_gene
+        
+        pop_new[index1] = p1
+        pop_new[index2] = p2
+        index1 += 2
+        index2 += 2
+    return 
 
 
 def genLoop(population, target, size, generations, struct):
     
     # INITIAL POPULATION WITH RANDOM WEIGHTS
-    population = populate(size)
+    population = populate(size, struct)
     
     for gen in range(generations):
         gen += 1
@@ -194,6 +190,11 @@ def gameLoop(individual, struct):
     predict_outs = runNNLoop(train_input, struct, individual)
     return predict_outs
 
+def draw(cord, target):
+    plt.xlim((-1,1))
+    plt.ylim((-1,1))
+    plt.scatter(cord[:,0],cord[:,1],c='green',s=12)
+    plt.scatter(target[0], target[1], c ='red', s = 60)
 
 data = pd.read_csv(r'Data.csv')
 data = data.sample(frac=1).reset_index(drop=True)
@@ -225,6 +226,8 @@ population = []
 #pprint.pprint(population)
 
 population, cord, answers = genLoop(population, target, size, generations, struct)
-
+draw(cord,(target,target))
+for i in range(len(answers)):
+    print(np.round(answers[i],2),'===',train_output[i])
 
 
