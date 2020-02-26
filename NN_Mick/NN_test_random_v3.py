@@ -161,8 +161,8 @@ def mate(population, pop_size):
         # one-point crossover (first half of w_matrices are swapped)
         # TWO CHILDREN
         # print('\n\np1 before', p1)
-        for w_matrix in range(math.ceil(len(p1) / 2)):
-            p1[w_matrix], p2[w_matrix] = p2[w_matrix], p1[w_matrix]
+        # for w_matrix in range(math.ceil(len(p1) / 2)):
+            # p1[w_matrix], p2[w_matrix] = p2[w_matrix], p1[w_matrix]
         # print('p1 after', p1)
         # total mix crossover (mix elements of every w_matrix)
         # if ele are the same they dont change
@@ -189,11 +189,14 @@ def mate(population, pop_size):
         # P1
         #random.choice here instead
         #for loop = adjust mutation rate of chromosome
-        # for i in range(len(p1)):
-        #     mutation = 2 * np.random.random(p1[i].shape) - 1
-        #     p1[i] += mutation
-        #     mutation = 2 * np.random.random(p2[i].shape) - 1
-        #     p2[i] += mutation
+        for i in range(len(p1)):
+            mutation = 2 * np.random.random(p1[i].shape) - 1
+            # print('\n\np1', p1)
+            p1[i] += mutation
+            # print('\n\np1after', p1)
+            # input()
+            mutation = 2 * np.random.random(p2[i].shape) - 1
+            p2[i] += mutation
 
         # random_gene_index = random.randrange(len(p1))
         # random_gene = p1[random_gene_index]
@@ -331,7 +334,7 @@ train_output = np.matrix(train_output_data.values)
 
 
 # struct has to match the input and output data
-size = 1000
+size = 500
 # struct = [3, 10, 10, 4]
 struct = [4, 3, 2, 1]
 #inputs = [1, 2, 3]

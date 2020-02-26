@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import copy
 
 ################################# DATA ####################################
 data=pd.read_csv(r'Data.csv')
@@ -53,7 +54,7 @@ def feed_forward(entity):
 plt.rcParams['figure.figsize']=[8,6]
 
 target=0
-size=100
+size=1000
 
 population=[]
 
@@ -94,7 +95,7 @@ def fitness(population,target, size):
         order=top_score[i][1]
         pop.append(order)
     
-    return np.array(pop)[:int(size*0.1)],np.array(cord),top_score[0],answers
+    return np.array(pop)[:int(size*0.05)],np.array(cord),top_score[0],answers
         
 
 def mate(population,size):
@@ -106,15 +107,23 @@ def mate(population,size):
         p1=population[np.random.randint(0,len(population))]
         p2=population[np.random.randint(0,len(population))]
         
+        # print(p1,'\n\n',p2)
+        # input()
+        
         for i in range(2):
             
             if i == 0:
                 child = np.concatenate(([p1[:10],p2[10:]]))
+                # child = copy.deepcopy(p1)
+                # if np.array_equal(child, childx): print(True) 
+                # else: print(False)
+                # input()
                 
             if i == 1:
                 child = np.concatenate(([p2[:10],p1[10:]]))
+                # child = copy.deepcopy(p2)
             
-            mutation=2*np.random.random((20,))-1
+            mutation= 0.5*np.random.random((20,))-0.25
             
             child=child+mutation
             
@@ -137,7 +146,8 @@ def cycle(population,target,size,generations):
         print('Generation:',gen)
         x=float(np.round(top_score[0],20))
         print('fittest: ',x)
-    
+        
+        # print(population)
         population=mate(population,size)
         #print('mate:',len(population))
         
@@ -157,7 +167,7 @@ def draw(cord, target):
     plt.scatter(target[0], target[1], c ='red', s = 60)
     
 
-generations=100
+generations=50
 
 #population=mate(population,size)
 #print('before cycle:',len(population))
