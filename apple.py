@@ -10,7 +10,7 @@ def chromosome_generetor(structure):
         k=structure[i]*structure[i+1]
         x.append(k)
     x=sum(x)
-    return 15*np.random.random((x,))-7.5
+    return 2*np.random.random((x,))-1
 
 #function to arrange the weights for each layers 
 def weights_classifier(structure,chromosome):
@@ -317,8 +317,12 @@ def populate(size):
     
     return initial_pop
 
-def fitness(population,size,structure):
+def fitness(population,size,structure,gen)):
     
+    if gen > 500:
+	top_percentail=0.1
+    else:
+	top_percentail=0.01
     score=[None]*size
     apples=[None]*size
     for index,chromosome in enumerate(population):
@@ -407,7 +411,7 @@ def cycle(generation,population,size,m_rate,structure,pattern):
     gen=0
     for _ in range(generation):
         gen+=1
-        population,warrior,weakest=fitness(population,size,structure)
+        population,warrior,weakest=fitness(population,size,structure,gen)
         population=mate(population,size,m_rate,pattern)
         path=r'weights_5\gen_'+str(gen)+'.txt'
         file=open(path,'w')
