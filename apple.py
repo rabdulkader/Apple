@@ -1,6 +1,6 @@
 import numpy as np
 import random,copy,time
-import pygame as pg
+from datetime import datetime as dt
 
 #set nn structure [input nodes,x hiddenlayers with x nodes....,output nodes, o for offset]
 #function to generate random chromosomes
@@ -180,21 +180,24 @@ def game(structure,chromosome):
     for i in range(len(x)):
         for j in range(len(y)):
             grid.append((x[i],y[j]))
-
+			
+    
     snake_head=grid[55]
     snake=[snake_head]
+	
     
     while running:
         
         #pg.event.get()
         
-        grid_c=copy.deepcopy(grid)
+        grid_c=copy.deepcopy(grid) 
 
         if apple_present==False:
+            time.sleep(0.001)
             for body in snake:
-                if body in grid:
-                    grid.remove(body)
-            apple=random.choice(grid)
+                if body in grid_c:
+                    grid_c.remove(body)
+            apple=random.choice(grid_c)
             apple_present=True
 
         vision_apple=visionApple(snake,apple)
@@ -280,7 +283,7 @@ def game(structure,chromosome):
         apple_steps -= 1
         if apple_steps == 0:
             running=False
-        if score==98:
+        if score==99:
             running=False
         #print(running)
  #       screen.fill(white)
@@ -317,12 +320,12 @@ def populate(size):
     
     return initial_pop
 
-def fitness(population,size,structure,gen)):
+def fitness(population,size,structure,gen):
     
     if gen > 500:
-	top_percentail=0.1
+        top_percentail=0.1
     else:
-	top_percentail=0.01
+        top_percentail=0.05
     score=[None]*size
     apples=[None]*size
     for index,chromosome in enumerate(population):
@@ -338,7 +341,7 @@ def fitness(population,size,structure,gen)):
     for i in range(size):
         order[i]=top_score[i][1]
     
-    top_snakes=np.array(order)[:int(size*0.05)]
+    top_snakes=np.array(order)[:int(size*0.1)]
     warrior=top_score[0]
     weakest=top_score[99]
     #best_apple=np.amax(apples)
@@ -361,7 +364,6 @@ def mutation(child,m_rate):
     return child
 
 def mate(population,size,m_rate,pattern):
-    
     new_pop=[]
     for _ in range(int(size/2)):
         
@@ -406,29 +408,58 @@ def mate(population,size,m_rate,pattern):
             
     return new_pop
 
-def cycle(generation,population,size,m_rate,structure,pattern):
-    population=populate(size)
-    gen=0
+def cycle(generation,population,size,m_rate,structure,pattern,gen):
+ 
+    if gen==0:
+        population=populate(size)
+
     for _ in range(generation):
+        start_time=dt.now()
         gen+=1
         population,warrior,weakest=fitness(population,size,structure,gen)
         population=mate(population,size,m_rate,pattern)
-        path=r'weights_5\gen_'+str(gen)+'.txt'
+        path='weights_5/gen_'+str(gen)+'.txt'
         file=open(path,'w')
         file.write(str(warrior[1].tolist()))
         file.close()
 
-        f=open(r'population_5\gen_'+str(gen)+'.txt','w')
+        f=open('population_5/gen_'+str(gen)+'.txt','w')
         f.write(str(population))
         f.close()
         print('Generation: ',str(gen),'-----','Fittest: ',warrior[0],' Score= ',warrior[2],'->',weakest[2],' Steps= ',warrior[3],'->',weakest[3])
+        print('Time Taken: ',dt.now()-start_time)
     return warrior
 
 structure=[28,14,7,4,0]
-
 size=500
-generations=5000
+generations=7000
 m_rate=100
 pattern='single_point'
 
-warrior=cycle(generations,population,size,m_rate,structure,pattern)
+interupted=input('Interupted?[y/n]: ')
+
+if interupted=='y':
+	gen=int(input('Last Gen: '))
+	
+	file=open('population_5/gen_'+str(gen)+'.txt','r')
+	gen_x=file.read()
+	file.close()
+
+	population=[None]*size
+	for j in range(0,len(population)):
+		refined_w=gen_x.split(')')[j].split('(')[1].split(',')
+		chromosome=[None]*len(refined_w)
+		for i in range(0,len(refined_w)):
+			if i == 0:
+				chromosome[i]=float(gen_x.split(')')[j].split('(')[1].split(',')[i].split('[')[1])
+			elif i == len(refined_w)-1:
+				chromosome[i]=float(gen_x.split(')')[j].split('(')[1].split(',')[i].split(']')[0])
+			else:
+				chromosome[i]=float(gen_x.split(')')[j].split('(')[1].split(',')[i])
+		population[j]=np.array(chromosome)
+    
+else:
+	new_pop=[]
+	gen=0
+print('All files are loaded and learning has started')
+warrior=cycle(generations,population,size,m_rate,structure,pattern,gen)
