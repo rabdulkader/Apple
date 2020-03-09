@@ -193,22 +193,22 @@ def game(structure,chromosome,speed):
             colors[line]=green
         else:
             colors=[red,red,red,red,red,red,red,red]
-        if vision_apple[0]==1:
-            print('N')
-        if vision_apple[1]==1:
-            print('S')
-        if vision_apple[2]==1:
-            print('W')
-        if vision_apple[3]==1:
-            print('E')
-        if vision_apple[4]==1:
-            print('NW')
-        if vision_apple[5]==1:
-            print('SW')
-        if vision_apple[6]==1:
-            print('NE')
-        if vision_apple[7]==1:
-            print('SE')
+       # if vision_apple[0]==1:
+      #      print('N')
+     #   if vision_apple[1]==1:
+    #        print('S')
+   #     if vision_apple[2]==1:
+  #          print('W')
+ #       if vision_apple[3]==1:
+#            print('E')
+       # if vision_apple[4]==1:
+      #      print('NW')
+     #   if vision_apple[5]==1:
+    #        print('SW')
+   #     if vision_apple[6]==1:
+  #          print('NE')
+ #       if vision_apple[7]==1:
+#            print('SE')
 
 
 
@@ -221,10 +221,10 @@ def game(structure,chromosome,speed):
             head_direction=[0, 0, 0, 0]
             tail_direction=[0, 0, 0, 0]
             
-   #     print('\nApple= ',vision_apple)
-  #      print('Body= ',vision_body)
- #       print('head_direction= ',head_direction,' tail_direction= ',tail_direction, ' wall_dis= ',vision_wall)
-#        print(' Score= ',score,' steps= ',steps)
+        print('\nApple= ',vision_apple)
+        print('Body= ',vision_body)
+        print('head_direction= ',head_direction,' tail_direction= ',tail_direction, ' wall_dis= ',vision_wall)
+        print(' Score= ',score,' steps= ',steps)
         
         nn_input=np.concatenate([vision_apple,vision_body,vision_wall,head_direction,tail_direction])
 
