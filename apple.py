@@ -391,7 +391,7 @@ def mate(population,size,m_rate,pattern):
     return new_pop
 
 def cycle(generation,population,size,m_rate,structure,pattern,gen):
-    counter=0
+    #counter=0
 	
     if gen==0:
         population=populate(size)
@@ -402,17 +402,17 @@ def cycle(generation,population,size,m_rate,structure,pattern,gen):
         population,warrior,weakest=fitness(population,size,structure,gen)
         population=mate(population,size,m_rate,pattern)
 		
-        if counter==10:
-                path='weights_5/gen_'+str(gen)+'.txt'
-                file=open(path,'w')
-                file.write(str(warrior[1].tolist()))
-                file.close()
+        #if counter==10:
+		path='weights_5/gen_'+str(gen)+'.txt'
+		file=open(path,'w')
+		file.write(str(warrior[1].tolist()))
+		file.close()
 
-                f=open('population_5/gen_'+str(gen)+'.txt','w')
-                f.write(str(population))
-                f.close()
-                print('Data Saved')
-                counter=0
+		f=open('population_5/gen_'+str(gen)+'.txt','w')
+		f.write(str(population))
+		f.close()
+                #print('Data Saved')
+                #counter=0
         counter+=1
         print('Generation: ',str(gen),'-----','Fittest: ',warrior[0],' Score= ',warrior[2],'->',weakest[2],' Steps= ',warrior[3],'->',weakest[3])
         print('Time Taken: ',dt.now()-start_time)
