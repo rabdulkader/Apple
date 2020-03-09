@@ -73,10 +73,10 @@ def visionApple(snake,apple):
         if apple[1]==n and apple[0]==w:
             vision_apple[4]=1    
 
-        if apple[1]==s and apple[0]==w:
+        if apple[1]==s and apple[0]+60==w:
             vision_apple[5]=1    
 
-        if apple[1]==n and apple[0]==e:
+        if apple[1]+60==n and apple[0]==e:
             vision_apple[6]=1 
 
         if apple[1]==s and apple[0]==e:
@@ -116,10 +116,10 @@ def visionBody(snake,apple):
             if snake[i][1]==n and snake[i][0]==w:
                 vision_body[4]=1    
 
-            if snake[i][1]==s and snake[i][0]==w:
+            if snake[i][1]==s and snake[i][0]+60==w:
                 vision_body[5]=1    
 
-            if snake[i][1]==n and snake[i][0]==e:
+            if snake[i][1]+60==n and snake[i][0]==e:
                 vision_body[6]=1 
 
             if snake[i][1]==s and snake[i][0]==e:
@@ -285,27 +285,7 @@ def game(structure,chromosome):
             running=False
         if score==99:
             running=False
-        #print(running)
- #       screen.fill(white)
-#
-   #     for i in range(len(grid_c)):
-  #          g_grid=pg.Rect(grid_c[i][0],grid_c[i][1],60,60)
- #           pg.draw.rect(screen,black,g_grid,1)
-#
-  #      g_apple=pg.Rect(apple[0],apple[1],60,60)
- #       pg.draw.rect(screen,green,g_apple)
-#
-       # for i in range(len(snake)):
-      #      if i==0:
-     #           color=red
-    #        else:
-   #             color=black
-  #          g_snake=pg.Rect(snake[i][0],snake[i][1],60,60)
- #           pg.draw.rect(screen,color,g_snake)
-#
-#        pg.display.flip()
-        
-        #time.sleep(0.2)
+
     return score,steps
 
 population=[]
@@ -332,7 +312,7 @@ def fitness(population,size,structure,gen):
         
         apple,steps=game(structure,chromosome)
         apples[index]=(apple)
-        point=(steps+((2**apple)+200*(apple**2.1))-(0.25*(steps**1.3)*(apple**1.2)))*-1
+        point=(steps+((2**apple)+500*(apple**2.1))-(0.25*(steps**1.3)*(apple**1.2)))*-1
         score[index]=point,chromosome,apple,steps,index
         
     top_score=np.array(score)[np.array(score)[:,0].argsort()]
@@ -432,7 +412,7 @@ def cycle(generation,population,size,m_rate,structure,pattern,gen):
 
 structure=[28,14,7,4,0]
 size=500
-generations=7000
+generations=5000
 m_rate=100
 pattern='single_point'
 
