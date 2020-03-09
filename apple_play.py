@@ -1,18 +1,7 @@
 import numpy as np
 import random,copy,time
-from datetime import datetime as dt
+import pygame as pg
 
-#set nn structure [input nodes,x hiddenlayers with x nodes....,output nodes, o for offset]
-#function to generate random chromosomes
-def chromosome_generetor(structure):
-    x=[]
-    for i in range(0,len(structure)-1):
-        k=structure[i]*structure[i+1]
-        x.append(k)
-    x=sum(x)
-    return 2*np.random.random((x,))-1
-
-#function to arrange the weights for each layers 
 def weights_classifier(structure,chromosome):
     weights_list=[]
     for i in range(0,len(structure)-2):
@@ -45,7 +34,6 @@ def playing(structure,chromosome,train_input):
     return np.array(decision)
 
 def visionApple(snake,apple):
-    #             n  s  w  e nw sw ne se
     vision_apple=[0, 0, 0, 0, 0, 0, 0, 0]
     n=snake[0][1]
     s=snake[0][1]
@@ -86,7 +74,6 @@ def visionApple(snake,apple):
     return vision_apple
 
 def visionBody(snake,apple):
-    #            n  s  w  e nw sw ne se
     vision_body=[0, 0, 0, 0, 0, 0, 0, 0]
 
     for i in range(1,len(snake)):
@@ -151,13 +138,13 @@ def move_d(decision):
     
     return move
 
-def game(structure,chromosome):
+def game(structure,chromosome,speed):
     
     frame_w=600
     frame_h=600
     
-    #pg.init()
-    #screen = pg.display.set_mode((frame_w,frame_h))
+    pg.init()
+    screen = pg.display.set_mode((frame_w,frame_h))
 
     white=[255,255,255]
     red=[255,0,0]
@@ -182,38 +169,63 @@ def game(structure,chromosome):
     for i in range(len(x)):
         for j in range(len(y)):
             grid.append((x[i],y[j]))
-			
-    
+
     snake_head=grid[55]
     snake=[snake_head]
-	
     
     while running:
         
-        #pg.event.get()
+        pg.event.get()
         
-        grid_c=copy.deepcopy(grid) 
+        grid_c=copy.deepcopy(grid)
 
         if apple_present==False:
-            time.sleep(0.001)
             for body in snake:
-                if body in grid_c:
-                    grid_c.remove(body)
-            apple=random.choice(grid_c)
+                if body in grid:
+                    grid.remove(body)
+            apple=random.choice(grid)
             apple_present=True
 
         vision_apple=visionApple(snake,apple)
+        if np.amax(vision_apple) > 0:
+            line=vision_apple.index(int(np.amax(vision_apple)))
+            colors=[red,red,red,red,red,red,red,red]
+            colors[line]=green
+        else:
+            colors=[red,red,red,red,red,red,red,red]
+        if vision_apple[0]==1:
+            print('N')
+        if vision_apple[1]==1:
+            print('S')
+        if vision_apple[2]==1:
+            print('W')
+        if vision_apple[3]==1:
+            print('E')
+        if vision_apple[4]==1:
+            print('NW')
+        if vision_apple[5]==1:
+            print('SW')
+        if vision_apple[6]==1:
+            print('NE')
+        if vision_apple[7]==1:
+            print('SE')
 
-        #print('\nApple= ',vision_apple)
 
-        #print('snake= ',snake,' apple= ',apple,' Score= ',score,' steps= ',steps)
+
+
 
         if steps==0:
             vision_body=[0, 0, 0, 0, 0, 0, 0, 0]
+            vision_apple=[0, 0, 0, 0, 0, 0, 0, 0]
             vision_wall=[0, 0, 0, 0]
             head_direction=[0, 0, 0, 0]
             tail_direction=[0, 0, 0, 0]
-
+            
+   #     print('\nApple= ',vision_apple)
+  #      print('Body= ',vision_body)
+ #       print('head_direction= ',head_direction,' tail_direction= ',tail_direction, ' wall_dis= ',vision_wall)
+#        print(' Score= ',score,' steps= ',steps)
+        
         nn_input=np.concatenate([vision_apple,vision_body,vision_wall,head_direction,tail_direction])
 
         ###call nn
@@ -233,7 +245,7 @@ def game(structure,chromosome):
             snake[0]=(snake[0][0]-60,snake[0][1])
         if move ==[0,0,0,1]:
             snake[0]=(snake[0][0]+60,snake[0][1])
-            
+        
             
         for i in range(1,len(snake)):
 
@@ -253,12 +265,14 @@ def game(structure,chromosome):
             score+=1
             apple_steps=200
             #print('Apple Gone')
-
+        
+        
+        
         if len(snake)==1:
             vision_body=[0, 0, 0, 0, 0, 0, 0, 0]
         elif len(snake)>1:
             vision_body=visionBody(snake,apple)
-        #print('Body= ',vision_body)
+        
 
         if snake[0][0] < 0 or snake[0][0] > 540 or snake[0][1] < 0 or snake[0][1] > 540 :
             #print('Wall Collision')
@@ -285,169 +299,78 @@ def game(structure,chromosome):
         apple_steps -= 1
         if apple_steps == 0:
             running=False
-        if score==99:
-            running=False
+        #print(running)
+        screen.fill(white)
+
+        #for i in range(len(grid_c)):
+            #g_grid=pg.Rect(grid_c[i][0],grid_c[i][1],60,60)
+            #pg.draw.rect(screen,black,g_grid,1)
+            
+        ln_l=pg.draw.line(screen,colors[0],(snake[0][0],snake[0][1]),(snake[0][0],0),2)
+        s_l=pg.draw.line(screen,colors[1],(snake[0][0],snake[0][1]),(snake[0][0],600),2)
+        w_l=pg.draw.line(screen,colors[2],(snake[0][0],snake[0][1]),(0,snake[0][1]),2)
+        e_l=pg.draw.line(screen,colors[3],(snake[0][0],snake[0][1]),(600,snake[0][1]),2)
+        nw_l=pg.draw.line(screen,colors[4],(snake[0][0],snake[0][1]),(snake[0][0]-600,snake[0][1]-600),2)
+        sw_l=pg.draw.line(screen,colors[5],(snake[0][0],snake[0][1]),(snake[0][0]-600,snake[0][1]+600),2)
+        ne_l=pg.draw.line(screen,colors[6],(snake[0][0],snake[0][1]),(snake[0][0]+600,snake[0][1]-600),2)
+        ne_l=pg.draw.line(screen,colors[7],(snake[0][0],snake[0][1]),(snake[0][0]+600,snake[0][1]+600),2)
+        
+        g_apple=pg.Rect(apple[0]+15,apple[1]+15,30,30)
+        pg.draw.rect(screen,green,g_apple)
+
+        for i in range(len(snake)):
+            if i==0:
+                color=red
+            else:
+                color=black
+            g_snake=pg.Rect(snake[i][0],snake[i][1],60,60)
+            pg.draw.rect(screen,color,g_snake)
+
+        pg.display.flip()
+        
+        time.sleep(speed)
 
     return score,steps
 
-population=[]
-
-def populate(size):
-    
-    initial_pop=[None]*size
-    
-    for i in range(size):
-        chromosome=chromosome_generetor(structure)
-        initial_pop[i]=chromosome
-    
-    return initial_pop
-
-def fitness(population,size,structure,gen):
-    
-    if gen > 500:
-        top_percentail=0.1
-    else:
-        top_percentail=0.05
-    score=[None]*size
-    apples=[None]*size
-    for index,chromosome in enumerate(population):
-        
-        apple,steps=game(structure,chromosome)
-        apples[index]=(apple)
-        point=(steps+((2**apple)+500*(apple**2.1))-(0.25*(steps**1.3)*(apple**1.2)))*-1
-        score[index]=point,chromosome,apple,steps,index
-        
-    top_score=np.array(score)[np.array(score)[:,0].argsort()]
-    #print(top_score)
-    order=[None]*size
-    for i in range(size):
-        order[i]=top_score[i][1]
-    
-    top_snakes=np.array(order)[:int(size*0.1)]
-    warrior=top_score[0]
-    weakest=top_score[99]
-    #best_apple=np.amax(apples)
-    #print(top_score[0][2],top_score[0][3],top_score[99][2],top_score[99][3])
-    return top_snakes,warrior,weakest
-
-def mutation(child,m_rate):
-    
-    loop=int(round((len(child)/100)*m_rate))
-    #x=len(child)
-    #child=np.reshape(child,(1,x))
-    x=child.tolist()
-    #print(len(x))
-    for _ in range(loop):
-        i=random.randrange(0,len(x),1)
-        #print(i)
-        child[i]=child[i]+(2*np.random.random()-1)
-    
-    #child=np.reshape(child,(x,1))
-    return child
-
-def mate(population,size,m_rate,pattern):
-    new_pop=[]
-    for _ in range(int(size/2)):
-        
-        #print(len(population))
-        p1=population[np.random.randint(0,len(population))]
-        p2=population[np.random.randint(0,len(population))]
-        
-
-        if pattern=='single_point':
-            x=int(round(((len(p1)/100)*50)+0.1))
-            for i in range(2):
-            
-                if i == 0:
-                    child = np.concatenate(([p1[:x],p2[x:]]))
-
-                if i == 1:
-                    child = np.concatenate(([p2[:x],p1[x:]]))
-                
-                child=mutation(np.array(child),m_rate)
-                new_pop.append(child)
-        
-        if pattern=='multi_point':
-            child=[None]*len(p1)
-            for i in range(0,len(child),2):
-                if i == len(child)-1:
-                    child[i]=p1[i]
-                else:
-                    child[i]=p1[i]
-                    child[i+1]=p2[i+1]       
-            child=mutation(np.array(child),m_rate)
-            new_pop.append(child)
-
-            child=[None]*len(p1)
-            for i in range(0,len(child),2):
-                if i == len(child)-1:
-                    child[i]=p2[i]
-                else:
-                    child[i]=p2[i]
-                    child[i+1]=p1[i+1]
-            child=mutation(np.array(child),m_rate)
-            new_pop.append(child)
-            
-    return new_pop
-
-def cycle(generation,population,size,m_rate,structure,pattern,gen):
-    counter=0
-	
-    if gen==0:
-        population=populate(size)
-	
-    for _ in range(generation):
-        start_time=dt.now()
-        gen+=1
-        population,warrior,weakest=fitness(population,size,structure,gen)
-        population=mate(population,size,m_rate,pattern)
-		
-        if counter==10:
-                path='weights_5/gen_'+str(gen)+'.txt'
-                file=open(path,'w')
-                file.write(str(warrior[1].tolist()))
-                file.close()
-
-                f=open('population_5/gen_'+str(gen)+'.txt','w')
-                f.write(str(population))
-                f.close()
-                print('Data Saved')
-                counter=0
-        counter+=1
-        print('Generation: ',str(gen),'-----','Fittest: ',warrior[0],' Score= ',warrior[2],'->',weakest[2],' Steps= ',warrior[3],'->',weakest[3])
-        print('Time Taken: ',dt.now()-start_time)
-    return warrior
-
 structure=[28,14,7,4,0]
-size=500
-generations=10
-m_rate=100
-pattern='single_point'
+start=int(input('From= '))
+end=int(input('To= '))
+speed=float(input('Frame Speed (s)= '))
+for j in range(start,end):
+    while True:
+        try:
+                file=open('weights_5/gen_'+str(j)+'.txt','r')
+                break
+        except:
+                file=open('weights_5/gen_'+str(j-1)+'.txt','r')
+                weights=file.read()
+                file.close()
+                refined_w=weights.split(',')
+                chromosome=[None]*len(refined_w)
 
-interupted=input('Interupted?[y/n]: ')
+                for i in range(len(refined_w)):
+                        if i==0:
+                                chromosome[i]=(float(refined_w[i].split('[')[1]))
+                        elif i==len(refined_w)-1:
+                                chromosome[i]=(float(refined_w[i].split(']')[0]))
+                        else:
+                                chromosome[i]=(float(refined_w[i]))
+                score,steps=game(structure,chromosome,speed)
+                print('Gen= ',j,'-----Score= ',score)
 
-if interupted=='y':
-	gen=int(input('Last Gen: '))
-	
-	file=open('population_5/gen_'+str(gen)+'.txt','r')
-	gen_x=file.read()
-	file.close()
+    weights=file.read()
+    file.close()
 
-	population=[None]*size
-	for j in range(0,len(population)):
-		refined_w=gen_x.split(')')[j].split('(')[1].split(',')
-		chromosome=[None]*len(refined_w)
-		for i in range(0,len(refined_w)):
-			if i == 0:
-				chromosome[i]=float(gen_x.split(')')[j].split('(')[1].split(',')[i].split('[')[1])
-			elif i == len(refined_w)-1:
-				chromosome[i]=float(gen_x.split(')')[j].split('(')[1].split(',')[i].split(']')[0])
-			else:
-				chromosome[i]=float(gen_x.split(')')[j].split('(')[1].split(',')[i])
-		population[j]=np.array(chromosome)
+    refined_w=weights.split(',')
+    chromosome=[None]*len(refined_w)
     
-else:
-	new_pop=[]
-	gen=0
-print('All files are loaded and learning has started')
-warrior=cycle(generations,population,size,m_rate,structure,pattern,gen)
+    for i in range(len(refined_w)):
+        if i==0:
+            chromosome[i]=(float(refined_w[i].split('[')[1]))
+        elif i==len(refined_w)-1:
+            chromosome[i]=(float(refined_w[i].split(']')[0]))
+        else:
+            chromosome[i]=(float(refined_w[i]))
+            
+    score,steps=game(structure,chromosome,speed)  
+    print('Gen= ',j,'-----Score= ',score)
