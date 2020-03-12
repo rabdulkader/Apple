@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import random,copy,time
 from datetime import datetime as dt
@@ -90,43 +91,34 @@ def visionBody(snake,apple):
     #            n  s  w  e nw sw ne se
     vision_body=[0, 0, 0, 0, 0, 0, 0, 0]
 
+    y=snake[0][1]
+    x=snake[0][0]
+
     for i in range(1,len(snake)):
-        
-        n=snake[0][1]
-        s=snake[0][1]
-        w=snake[0][0]
-        e=snake[0][0]
-        
-        for _ in range(10):
-
-            n-=60
-            s+=60
-            w-=60
-            e+=60
-
-            if snake[i][1]==n and snake[i][0]==snake[0][0]:
-                vision_body[0]=1
-
-            if snake[i][1]==s and snake[i][0]==snake[0][0]:
-                vision_body[1]=1  
-
-            if snake[i][0]==w and snake[i][1]==snake[0][1]:
-                vision_body[2]=1      
-
-            if snake[i][0]==e and snake[i][1]==snake[0][1]:
-                vision_body[3]=1        
-
-            if snake[i][1]==n and snake[i][0]==w:
-                vision_body[4]=1    
-
-            if snake[i][1]==s and snake[i][0]+60==w:
-                vision_body[5]=1    
-
-            if snake[i][1]+60==n and snake[i][0]==e:
-                vision_body[6]=1 
-
-            if snake[i][1]==s and snake[i][0]==e:
-                vision_body[7]=1
+        #n
+        if snake[i][1]+60==y and snake[i][0]==x:
+            vision_body[0]=1
+        #s
+        if snake[i][1]-60==y and snake[i][0]==x:
+            vision_body[1]=1  
+        #w
+        if snake[i][0]+60==x and snake[i][1]==y:
+            vision_body[2]=1      
+        #e
+        if snake[i][0]-60==x and snake[i][1]==y:
+            vision_body[3]=1        
+        #nw
+        if snake[i][1]+60==y and snake[i][0]+60==x:
+            vision_body[4]=1
+        #sw
+        if snake[i][1]-60==y and snake[i][0]+60==x:
+            vision_body[5]=1    
+        #ne
+        if snake[i][1]+60==y and snake[i][0]-60==x:
+            vision_body[6]=1 
+        #se
+        if snake[i][1]-60==y and snake[i][0]-60==x:
+            vision_body[7]=1
             
     return vision_body
 
@@ -339,7 +331,7 @@ def mutation(child,m_rate):
     for _ in range(loop):
         i=random.randrange(0,len(x),1)
         #print(i)
-        child[i]=child[i]+(2*np.random.random()-1)
+        child[i]=child[i]+(1*np.random.random()-0.5)
     
     #child=np.reshape(child,(x,1))
     return child
@@ -410,6 +402,7 @@ def cycle(generation,population,size,m_rate,structure,pattern,gen):
         f=open('population_5/gen_'+str(gen)+'.txt','w')
         f.write(str(population))
         f.close()
+        os.system('rm -rf population_5/gen_'+str(gen-1)+'.txt')
                 #print('Data Saved')
                 #counter=0
         #counter+=1
@@ -419,7 +412,7 @@ def cycle(generation,population,size,m_rate,structure,pattern,gen):
 
 structure=[28,14,7,4,0]
 size=500
-generations=5000
+generations=12000
 m_rate=100
 pattern='single_point'
 

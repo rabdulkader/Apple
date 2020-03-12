@@ -76,43 +76,35 @@ def visionApple(snake,apple):
 def visionBody(snake,apple):
     vision_body=[0, 0, 0, 0, 0, 0, 0, 0]
 
+    y=snake[0][1]
+    x=snake[0][0]
+
     for i in range(1,len(snake)):
-        
-        n=snake[0][1]
-        s=snake[0][1]
-        w=snake[0][0]
-        e=snake[0][0]
-        
-        for _ in range(10):
+        #n
+        if snake[i][1]+60==y and snake[i][0]==x:
+            vision_body[0]=1
+        #s
+        if snake[i][1]-60==y and snake[i][0]==x:
+            vision_body[1]=1  
+        #w
+        if snake[i][0]+60==x and snake[i][1]==y:
+            vision_body[2]=1      
+        #e
+        if snake[i][0]-60==x and snake[i][1]==y:
+            vision_body[3]=1        
+        #nw
+        if snake[i][1]+60==y and snake[i][0]+60==x:
+            vision_body[4]=1
+        #sw
+        if snake[i][1]-60==y and snake[i][0]+60==x:
+            vision_body[5]=1    
+        #ne
+        if snake[i][1]+60==y and snake[i][0]-60==x:
+            vision_body[6]=1 
+        #se
+        if snake[i][1]-60==y and snake[i][0]-60==x:
+            vision_body[7]=1
 
-            n-=60
-            s+=60
-            w-=60
-            e+=60
-
-            if snake[i][1]==n and snake[i][0]==snake[0][0]:
-                vision_body[0]=1
-
-            if snake[i][1]==s and snake[i][0]==snake[0][0]:
-                vision_body[1]=1  
-
-            if snake[i][0]==w and snake[i][1]==snake[0][1]:
-                vision_body[2]=1      
-
-            if snake[i][0]==e and snake[i][1]==snake[0][1]:
-                vision_body[3]=1        
-
-            if snake[i][1]==n and snake[i][0]==w:
-                vision_body[4]=1    
-
-            if snake[i][1]==s and snake[i][0]+60==w:
-                vision_body[5]=1    
-
-            if snake[i][1]+60==n and snake[i][0]==e:
-                vision_body[6]=1 
-
-            if snake[i][1]==s and snake[i][0]==e:
-                vision_body[7]=1
             
     return vision_body
 
@@ -182,8 +174,8 @@ def game(structure,chromosome,speed):
         if apple_present==False:
             for body in snake:
                 if body in grid:
-                    grid.remove(body)
-            apple=random.choice(grid)
+                    grid_c.remove(body)
+            apple=random.choice(grid_c)
             apple_present=True
 
         vision_apple=visionApple(snake,apple)
@@ -221,15 +213,16 @@ def game(structure,chromosome,speed):
             head_direction=[0, 0, 0, 0]
             tail_direction=[0, 0, 0, 0]
             
-        print('\nApple= ',vision_apple)
-        print('Body= ',vision_body)
-        print('head_direction= ',head_direction,' tail_direction= ',tail_direction, ' wall_dis= ',vision_wall)
-        print(' Score= ',score,' steps= ',steps)
+   #     print('\nApple= ',vision_apple)
+  #      print('Body= ',vision_body)
+ #       print('head_direction= ',head_direction,' tail_direction= ',tail_direction, ' wall_dis= ',vision_wall)
+#        print(' Score= ',score,' steps= ',steps)
         
         nn_input=np.concatenate([vision_apple,vision_body,vision_wall,head_direction,tail_direction])
 
         ###call nn
         decision=playing(structure,chromosome,nn_input)
+    #    print(decision)
         #### call move
         move=move_d(decision)
         #print(decision)
