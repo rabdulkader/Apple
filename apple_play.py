@@ -148,7 +148,7 @@ def game(structure,chromosome,speed):
 
     score=0
     steps=0
-    apple_steps=200
+    apple_steps=500
 
     x=[]
     y=[]
@@ -244,7 +244,7 @@ def game(structure,chromosome,speed):
 
             if snake[i][0]==snake[0][0] and snake[i][1]==snake[0][1]:
                 #print('snake= ',snake,' apple= ',apple,' Score= ',score,' steps= ',steps)
-                #print('Body Collision')
+                print('Body Collision')
                 running=False
                 
 
@@ -256,7 +256,7 @@ def game(structure,chromosome,speed):
             snake.append(snake_c[-1])
             #snake_c=copy.deepcopy(snake)
             score+=1
-            apple_steps=200
+            apple_steps=500
             #print('Apple Gone')
         
         
@@ -268,7 +268,7 @@ def game(structure,chromosome,speed):
         
 
         if snake[0][0] < 0 or snake[0][0] > 540 or snake[0][1] < 0 or snake[0][1] > 540 :
-            #print('Wall Collision')
+            print('Wall Collision')
             running=False
 
 
@@ -292,7 +292,7 @@ def game(structure,chromosome,speed):
         apple_steps -= 1
         if apple_steps == 0:
             running=False
-        #print(running)
+            print('Too much steps')
         screen.fill(white)
 
         #for i in range(len(grid_c)):
