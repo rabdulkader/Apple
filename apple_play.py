@@ -132,16 +132,24 @@ def move_d(decision):
 
 def game(structure,chromosome,speed):
     
-    frame_w=600
-    frame_h=600
+    weights_list=weights_classifier(structure,chromosome)
+    
+    snake_frame_w=600
+    snake_frame_h=600
+    
+    nn_frame_w=800
+    nn_frame_h=1000
     
     pg.init()
-    screen = pg.display.set_mode((frame_w,frame_h))
+    screen = pg.display.set_mode((snake_frame_w+nn_frame_w,nn_frame_h))
 
     white=[255,255,255]
     red=[255,0,0]
     black=[0,0,0]
     green=[0,255,0]
+    desert=[115,92,64]
+    light_desert=[232,186,129]
+    grey=[64,64,64]
     
     running=True
     apple_present=False
@@ -153,7 +161,7 @@ def game(structure,chromosome,speed):
     x=[]
     y=[]
 
-    for i in range(0,frame_w,60):
+    for i in range(0,snake_frame_w,60):
         x.append(i)
         y.append(i)
 
@@ -185,27 +193,7 @@ def game(structure,chromosome,speed):
             colors[line]=green
         else:
             colors=[red,red,red,red,red,red,red,red]
-       # if vision_apple[0]==1:
-      #      print('N')
-     #   if vision_apple[1]==1:
-    #        print('S')
-   #     if vision_apple[2]==1:
-  #          print('W')
- #       if vision_apple[3]==1:
-#            print('E')
-       # if vision_apple[4]==1:
-      #      print('NW')
-     #   if vision_apple[5]==1:
-    #        print('SW')
-   #     if vision_apple[6]==1:
-  #          print('NE')
- #       if vision_apple[7]==1:
-#            print('SE')
-
-
-
-
-
+            
         if steps==0:
             vision_body=[0, 0, 0, 0, 0, 0, 0, 0]
             vision_apple=[0, 0, 0, 0, 0, 0, 0, 0]
@@ -222,7 +210,7 @@ def game(structure,chromosome,speed):
 
         ###call nn
         decision=playing(structure,chromosome,nn_input)
-    #    print(decision)
+        #print(decision)
         #### call move
         move=move_d(decision)
         #print(decision)
@@ -293,20 +281,36 @@ def game(structure,chromosome,speed):
         if apple_steps == 0:
             running=False
             print('Too much steps')
+            
         screen.fill(white)
+        
+        wall=pg.Rect(0,0,snake_frame_w,snake_frame_h)
+        background=pg.Rect(0,0,snake_frame_w,snake_frame_h)
+        pg.draw.rect(screen,desert,wall)
+        pg.draw.rect(screen,black,wall,2)
+        
+        stat_border=pg.Rect(0,snake_frame_h,snake_frame_w,snake_frame_h)
+        stat_background=pg.Rect(0,0,snake_frame_w,nn_frame_h)
+        pg.draw.rect(screen,light_desert,stat_background)
+        pg.draw.rect(screen,black,stat_border,2)
+        
+        nn_background=pg.Rect(snake_frame_w,0,nn_frame_w,nn_frame_h)
+        nn_board=pg.Rect(snake_frame_w,0,nn_frame_w,nn_frame_h)
+        pg.draw.rect(screen,grey,nn_background)
+        pg.draw.rect(screen,black,nn_board,1)
 
         #for i in range(len(grid_c)):
             #g_grid=pg.Rect(grid_c[i][0],grid_c[i][1],60,60)
             #pg.draw.rect(screen,black,g_grid,1)
             
-        ln_l=pg.draw.line(screen,colors[0],(snake[0][0],snake[0][1]),(snake[0][0],0),2)
-        s_l=pg.draw.line(screen,colors[1],(snake[0][0],snake[0][1]),(snake[0][0],600),2)
-        w_l=pg.draw.line(screen,colors[2],(snake[0][0],snake[0][1]),(0,snake[0][1]),2)
-        e_l=pg.draw.line(screen,colors[3],(snake[0][0],snake[0][1]),(600,snake[0][1]),2)
-        nw_l=pg.draw.line(screen,colors[4],(snake[0][0],snake[0][1]),(snake[0][0]-600,snake[0][1]-600),2)
-        sw_l=pg.draw.line(screen,colors[5],(snake[0][0],snake[0][1]),(snake[0][0]-600,snake[0][1]+600),2)
-        ne_l=pg.draw.line(screen,colors[6],(snake[0][0],snake[0][1]),(snake[0][0]+600,snake[0][1]-600),2)
-        ne_l=pg.draw.line(screen,colors[7],(snake[0][0],snake[0][1]),(snake[0][0]+600,snake[0][1]+600),2)
+       # ln_l=pg.draw.line(screen,colors[0],(snake[0][0],snake[0][1]),(snake[0][0],0),2)
+      #  s_l=pg.draw.line(screen,colors[1],(snake[0][0],snake[0][1]),(snake[0][0],600),2)
+     #   w_l=pg.draw.line(screen,colors[2],(snake[0][0],snake[0][1]),(0,snake[0][1]),2)
+    #    e_l=pg.draw.line(screen,colors[3],(snake[0][0],snake[0][1]),(600,snake[0][1]),2)
+   #     nw_l=pg.draw.line(screen,colors[4],(snake[0][0],snake[0][1]),(snake[0][0]-600,snake[0][1]-600),2)
+  #      sw_l=pg.draw.line(screen,colors[5],(snake[0][0],snake[0][1]),(snake[0][0]-600,snake[0][1]+600),2)
+ #       ne_l=pg.draw.line(screen,colors[6],(snake[0][0],snake[0][1]),(snake[0][0]+600,snake[0][1]-600),2)
+#        ne_l=pg.draw.line(screen,colors[7],(snake[0][0],snake[0][1]),(snake[0][0]+600,snake[0][1]+600),2)
         
         g_apple=pg.Rect(apple[0]+15,apple[1]+15,30,30)
         pg.draw.rect(screen,green,g_apple)
@@ -317,7 +321,70 @@ def game(structure,chromosome,speed):
             else:
                 color=black
             g_snake=pg.Rect(snake[i][0],snake[i][1],60,60)
+            b_snake=pg.Rect(snake[i][0],snake[i][1],60,60)
             pg.draw.rect(screen,color,g_snake)
+            pg.draw.rect(screen,white,b_snake,1)
+            
+        outputs=[0]
+        for i in range(len(weights_list)):
+            if i==0:
+                output=sigmoid(np.dot(nn_input,weights_list[i]))
+            else:
+                output=sigmoid(np.dot(output,weights_list[i])) 
+            outputs.append(output)
+        outputs
+
+        node_cords=[]
+        for i in range(len(structure)-1):
+            if i !=0:
+                strongest_nodes=np.where(outputs[i]==np.amax(outputs[i]))[1].tolist()
+            if i == 0:
+                y_cor=snake_frame_w+10+15
+            else:
+                y_cor=(y_cor+int((nn_frame_h/30)/(len(structure)-1))*30)
+
+            start_x=int(((nn_frame_h/30)-structure[i])/2) * 30
+
+            nodes_center_cor=[]
+            for x in range(structure[i]):
+                if x==0:
+                    x_cor=(start_x-30)+45
+                else:
+                    x_cor=x_cor+30
+
+                nodes_center_cor.append((x_cor,y_cor))       
+
+                if i == 0:
+                    if nn_input[x] != 0:
+                        pg.draw.circle(screen, green, (y_cor,x_cor) , 13)
+                    else:
+                        pg.draw.circle(screen, white, (y_cor,x_cor) , 10)
+
+                elif i != 0:
+                    if x in strongest_nodes:
+                        #print('---------------->',x,strongest_line)
+                        pg.draw.circle(screen, green, (y_cor,x_cor) , 13)
+                    else:
+                        pg.draw.circle(screen, white, (y_cor,x_cor) , 10)
+
+                else:
+                    #print('-->',x)
+                    pg.draw.circle(screen, white, (y_cor,x_cor) , 10)
+
+            node_cords.append(nodes_center_cor)
+            #node_cords.append(0)
+
+        for i in range(len(node_cords)):
+            if i < len(node_cords)-1:
+                for from_cor in node_cords[i]:
+                    #print(from_cor[0],from_cor[1]+10)
+                    for to_cor in node_cords[i+1]:
+                        #print(from_cor[0],from_cor[1]+10,to_cor[0],to_cor[1]-10)
+                        r=random.randint(0,255)
+                        g=random.randint(0,255)
+                        b=random.randint(0,255)
+                        l_color=[r,g,b]
+                        line=pg.draw.line(screen,l_color,(from_cor[1]+13,from_cor[0]),(to_cor[1]-13,to_cor[0]),1)
 
         pg.display.flip()
         
