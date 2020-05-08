@@ -38,6 +38,8 @@ def feed_forward(structure,chromosome,train_input):
     for i in range(len(weights_list)):
         if i==0:
             output=sigmoid(np.dot(train_input,weights_list[i]))
+        elif i == len(weights_list)-1:
+            output=sigmoid(np.dot(output,weights_list[i])*0.005)
         else:
             output=sigmoid(np.dot(output,weights_list[i]))     
     return output
@@ -162,7 +164,7 @@ def game(chromosome):
 
     score=0
     steps=0
-    apple_steps=200
+    apple_steps=500
 
     x=[]
     y=[]
@@ -213,8 +215,8 @@ def game(chromosome):
         decision=playing(structure,chromosome,nn_input)
         #### call move
         move=move_d(decision)
-        #print(decision)
-        
+ #       print(decision)
+#        print(move)
 
         snake_c=copy.deepcopy(snake)
 
@@ -244,7 +246,7 @@ def game(chromosome):
             snake.append(snake_c[-1])
             #snake_c=copy.deepcopy(snake)
             score+=1
-            apple_steps=200
+            apple_steps=500
             #print('Apple Gone')
 
         if len(snake)==1:
@@ -331,7 +333,7 @@ def mutation(child,m_rate):
     for _ in range(loop):
         i=random.randrange(0,len(x),1)
         #print(i)
-        child[i]=child[i]+(1*np.random.random()-0.5)
+        child[i]=child[i]+(0.5*np.random.random()-0.25)
     
     #child=np.reshape(child,(x,1))
     return child
@@ -394,15 +396,15 @@ def cycle(generation,population,size,m_rate,structure,pattern,gen):
         population=mate(population,size,m_rate,pattern)
 		
         #if counter==10:
-        path='weights_5/gen_'+str(gen)+'.txt'
+        path='weights_6/gen_'+str(gen)+'.txt'
         file=open(path,'w')
         file.write(str(warrior[1].tolist()))
         file.close()
 
-        f=open('population_5/gen_'+str(gen)+'.txt','w')
+        f=open('population_6/gen_'+str(gen)+'.txt','w')
         f.write(str(population))
         f.close()
-        os.system('rm -rf population_5/gen_'+str(gen-1)+'.txt')
+        os.system('rm -rf population_6/gen_'+str(gen-1)+'.txt')
                 #print('Data Saved')
                 #counter=0
         #counter+=1
@@ -412,7 +414,7 @@ def cycle(generation,population,size,m_rate,structure,pattern,gen):
 
 structure=[28,14,7,4,0]
 size=500
-generations=12000
+generations=10000
 m_rate=100
 pattern='single_point'
 
@@ -421,7 +423,7 @@ interupted=input('Interupted?[y/n]: ')
 if interupted=='y':
 	gen=int(input('Last Gen: '))
 	
-	file=open('population_5/gen_'+str(gen)+'.txt','r')
+	file=open('population_6/gen_'+str(gen)+'.txt','r')
 	gen_x=file.read()
 	file.close()
 
